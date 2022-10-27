@@ -1,0 +1,281 @@
+##
+## entropy-based rules
+##
+#- id: high-entropy
+#  message: High Entropy
+#  minlen: 20
+#  alphabet: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/="
+#  threshold: 4.5
+#  severity: MEDIUM
+#- id: high-entropy
+#  message: High Entropy
+#  minlen: 20
+#  alphabet: "0123456789abcdefABCDEF"
+#  threshold: 3.0
+#  severity: MEDIUM
+
+# regex-based rules
+
+- id: generic.mail
+  message: Email Address
+  pattern: "(\\b[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\\b)"
+  severity: LOW
+
+
+- id: private.pgp-key
+  message: PGP Private Key Block
+  pattern: "-----BEGIN PGP PRIVATE KEY BLOCK-----"
+  severity: HIGH
+- id: private.key
+  message: Private Key
+  pattern: "-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----"
+  severity: HIGH
+
+- id: amazon.aws-api-key
+  message: AWS API Key
+  pattern: "AKIA[0-9A-Z]{16}"
+  severity: MEDIUM
+- id: amazon.mws-auth-token
+  message: Amazon MWS Auth Token
+  pattern: "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+  severity: MEDIUM
+
+- id: facebook.access-token
+  message: Facebook Access Token
+  pattern: "EAACEdEose0cBA[0-9A-Za-z]+"
+  severity: MEDIUM
+- id: facebook.oauth-token
+  message: Facebook OAuth Token
+  pattern: '[f|F][a|A][c|C][e|E][b|B][o|O][o|O][k|K].{1,40}[''|"][0-9a-f]{32}[''|"]'
+  severity: MEDIUM
+
+# TODO add new github token formats
+- id: github.token
+  message: GitHub Token
+  pattern: '[g|G][i|I][t|T][h|H][u|U][b|B].{1,40}[''|"][0-9a-zA-Z]{35,40}[''|"]'
+  severity: MEDIUM
+
+- id: google.access-token
+  message: Google Access Token
+  pattern: "ya29\\.[0-9A-Za-z\\-_]+"
+  severity: MEDIUM
+- id: google.api-key
+  message: Google API Key
+  pattern: "AIza[0-9A-Za-z\\-_]{35}"
+  severity: MEDIUM
+- id: google.oauth-token
+  message: Google OAuth
+  pattern: "[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com"
+  severity: MEDIUM
+- id: google.gcp-service-account
+  message: Google Cloud Platform Service Account
+  pattern: '"type": "service_account"'
+  severity: MEDIUM
+
+- id: heroku.api-key
+  message: Heroku API Key
+  pattern: "[h|H][e|E][r|R][o|O][k|K][u|U].{1,40}[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"
+  severity: MEDIUM
+
+- id: mailchimp.api-key
+  message: MailChimp API Key
+  pattern: "[0-9a-f]{32}-us[0-9]{1,2}"
+  severity: MEDIUM
+
+- id: mailgun.api-key
+  message: Mailgun API Key
+  pattern: "key-[0-9a-zA-Z]{32}"
+  severity: MEDIUM
+
+- id: paypal.braintree-access-token
+  message: PayPal Braintree Access Token
+  pattern: "access_token\\$production\\$[0-9a-z]{16}\\$[0-9a-f]{32}"
+  severity: MEDIUM
+
+- id: picatic.api-key
+  message: Picatic API Key
+  pattern: "sk_live_[0-9a-z]{32}"
+  severity: MEDIUM
+
+- id: slack.token
+  message: Slack Token
+  pattern: "xox[p|b|o|a]-[0-9]{5,30}-[0-9]{5,30}-[0-9A-Za-z]{7,30}"
+  severity: MEDIUM
+- id: slack.bot-token
+  message: Slack Bot Token
+  pattern: "xox[p|b|o|a]-[0-9]{12}-[0-9]{12}-[a-z0-9]{24}"
+  severity: MEDIUM
+- id: slack.webhook
+  message: Slack Webhook
+  pattern: "https://hooks.slack.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}"
+  severity: MEDIUM
+
+- id: stripe.api-key
+  message: Stripe API Key
+  pattern: "sk_live_[0-9a-zA-Z]{24}"
+  severity: MEDIUM
+- id: stripe.restricted-api-key
+  message: Stripe Restricted API Key
+  pattern: "rk_live_[0-9a-zA-Z]{24}"
+  severity: MEDIUM
+
+- id: square.access-token
+  message: Square Access Token
+  pattern: "sq0atp-[0-9A-Za-z\\-_]{22}"
+  severity: MEDIUM
+- id: square.oauth-secret
+  message: Square OAuth Secret
+  pattern: "sq0csp-[0-9A-Za-z\\-_]{43}"
+  severity: MEDIUM
+
+- id: twilio.api-key
+  message: Twilio API Key
+  pattern: "SK[0-9a-fA-F]{32}"
+  severity: MEDIUM
+
+- id: twitter.access-token
+  message: Twitter Access Token
+  pattern: "[t|T][w|W][i|I][t|T][t|T][e|E][r|R].{1,40}[1-9][0-9]+-[0-9a-zA-Z]{40}"
+  severity: MEDIUM
+- id: twitter.oauth-token
+  message: Twitter OAuth Token
+  pattern: '[t|T][w|W][i|I][t|T][t|T][e|E][r|R].{1,40}[''|"][0-9a-zA-Z]{35,44}[''|"]'
+  severity: MEDIUM
+
+- id: generic.api-key
+  message: Generic API Key
+  pattern: '[a|A][p|P][i|I][_]?[k|K][e|E][y|Y].{1,40}[''|"][0-9a-zA-Z]{32,45}[''|"]'
+  severity: LOW
+- id: generic.secret
+  message: Generic Secret
+  pattern: '[s|S][e|E][c|C][r|R][e|E][t|T].{32][''|"][0-9a-zA-Z]{32,45}[''|"]'
+  severity: LOW
+- id: generic.password-in-url
+  message: Password in URL
+  pattern: "[a-zA-Z]{3,10}://[^/\\s:@]{3,20}:[^/\\s:@]{3,20}@.{1,100}[\"'\\s]"
+  severity: LOW
+
+#
+# Experimental
+#
+- id: generic_api_key
+  message: Generic API key
+  pattern: 'api.?key.?[\d\w]{1,40}'
+  severity: LOW
+#
+#- id: generic_id
+#  message: Generic id key
+#  pattern: 'id.?\s?:\s?.?[^""'']{4,40}'
+#  severity: LOW
+#
+#- id: generic_auth_key
+#  message: Generic auth key
+#  pattern: 'auth.?key.?[\d\w]{1,40}'
+#  severity: LOW
+#
+- id: generic_service_key
+  message: Generic service key
+  pattern: 'service.?key.?[\d\w]{1,40}'
+  severity: LOW
+
+#- id: generic_account_key
+#  message: Generic account key
+#  pattern: 'account.?key.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_db_key
+#  message: Generic DB Key
+#  pattern: 'db.?key.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_database_key
+#  message: Generic Databaes key
+#  pattern: 'database.?key.?[\d\w]{1,40}'
+#  severity: LOW
+#
+- id: generic_priv_key
+  message: Generic Priv Key
+  pattern: 'priv.?key.?[\d\w]{1,40}'
+  severity: LOW
+#
+#- id: generic_client_key
+#  message: Generic Client Key
+#  pattern: 'client.?key.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_db_pass
+#  message: Generic DB Pass
+#  pattern: 'db.?pass.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_database_pass
+#  message: Generic Database Pass
+#  pattern: 'database.?pass.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_key_pass
+#  message: Generic keywords
+#  pattern: 'key.?pass.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_auth_key
+#  message: Generic keywords
+#  pattern: 'password.?"?:?\s?"?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_auth_key
+#  message: Generic keywords
+#  pattern: 'passwd.?[\d\w]{1,40}'
+#  severity: LOW
+#
+#- id: generic_auth_key
+#  message: Generic keywords
+#  pattern: '(?i)secret.?[\d\w]{1,40}'
+#  severity: LOW
+
+- id: jwt_token
+  message: JWT token
+  pattern: '(ey[\w-]{20,}\.[\w-]{20,}\.[\w-]{20,})'
+  severity: HIGH
+#
+#- id: hash_token
+#  message: Hash Token
+#  pattern: '(?i)hash\s?[:=;]\s?[\w\d]+'
+#  severity: LOW
+
+- id: aws_api_gateway
+  message: AWS API Gateway
+  pattern: 'https?:\/\/[\w\d]+\.execute-api\.\w{2,5}-\w{2,5}-\d\.amazonaws.com\/[\d\w]+'
+  severity: LOW
+
+- id: X_AMZ_SECURITY_TOKEN
+  message: X_AMZ_SECURITY_TOKEN
+  pattern: 'X_AMZ_SECURITY_TOKEN.+[\wd]'
+  severity: LOW
+
+- id: X_AMZ_SECURITY_TOKEN
+  message: X_AMZ_SECURITY_TOKEN
+  pattern: '(?i)X_AMZ_SECURITY_TOKEN.+[\wd]'
+  severity: LOW
+
+- id: AUTHORIZATION_TOKEN
+  message: AUTHORIZATION_TOKEN
+  pattern: '(?i)AUTHORIZATION\s?[=:;]\s?.?[\w\d]+'
+  severity: LOW
+
+- id: env.node_env
+  message: NODE_ENV
+  pattern: '["](NODE_ENV)["]:\s?["].{5,20}'
+  severity: LOW
+- id: env.moonactive_env
+  message: Moonactive env
+  pattern: '["](MOONACTIVE_ENV)["]:\s?["].{5,20}'
+  severity: LOW
+- id: env.admin365_env
+  message: Admin365 env
+  pattern: '["](ADMIN365_ENV)["]:\s?["].{5,20}'
+  severity: LOW
+- id: env.coralogix_application_name
+  message: Coralogix Application Name env
+  pattern: '["](CORALOGIX_APPLICATION_NAME)["]:\s?["].{5,20}'
+  severity: LOW
