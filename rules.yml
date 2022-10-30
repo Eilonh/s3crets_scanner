@@ -267,10 +267,7 @@
   message: NODE_ENV
   pattern: '["](NODE_ENV)["]:\s?["].{5,20}'
   severity: LOW
-- id: env.moonactive_env
-  message: Moonactive env
-  pattern: '["](MOONACTIVE_ENV)["]:\s?["].{5,20}'
-  severity: LOW
+
 - id: env.admin365_env
   message: Admin365 env
   pattern: '["](ADMIN365_ENV)["]:\s?["].{5,20}'
