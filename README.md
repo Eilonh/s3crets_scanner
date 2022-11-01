@@ -38,9 +38,16 @@ The automation will perform the following actions:
             ],
             "Resource": "arn:aws:s3:::*"
         },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "*"
+        }
     ]
 }
 ```
+
 4. If you're using a CSV file - make sure to place the file `accounts.csv` in the `csv` directory, in the following format:
 ```csv
 Account name,Account id
@@ -67,10 +74,11 @@ pip3 install trufflehog3
 -----
 ## Usage
 
-| Argument | Values | Description| Required| 
+| Argument | Values | Description| Required|
 | :---: | :---: | :---: | :---: |
 | -p, --aws_profile |  | The aws profile name for the access keys | &check;
 | -r, --scanner_role |  | The aws scanner\'s role name | &check;
+| -m, --method | internal |the scan type | &check;
 | -l, --last_modified |  1-365 | Number of days to scan since the file was last modified; _Default - 1_| &cross;
 
 
