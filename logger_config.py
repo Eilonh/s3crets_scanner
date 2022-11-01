@@ -21,3 +21,6 @@ def logger_conf():
         fh.setFormatter(formatter)
         logger.addHandler(fh)
         logger.addHandler(logging.StreamHandler(sys.stdout))
+
+        
+#ssgahsa
