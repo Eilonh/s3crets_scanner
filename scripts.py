@@ -12,13 +12,13 @@ def scan_internal_accounts(aws_profile: str, scanner_role: str, time_delta: int)
     """ Main function to scan internal accounts
 
     Args:
-        aws_profile: the aws profile in ~./aws/credentials
-        scanner_role: the role name without ARN
-        time_delta: the number of days to scan since the file was last modified
+        aws_profile: the aws profile in ~/.aws/credentials
+        scanner_role: the role name without ARN prefix
+        time_delta: the number of days in the past to scan since the file was last modified
     """
     total_public_files = dict()
     accounts = utils.read_csv()
-    for account_name, account_id in accounts.items():
+    for account_name, account_id in accounts.items():#
         sts_token = aws.get_sts_token(account_id,
                                       profile_name=aws_profile,
                                       scanner_role_name=scanner_role)
