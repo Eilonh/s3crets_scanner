@@ -107,7 +107,7 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
     Args:
         session: the active session key
         bucket_name: the name of the specific bucket
-        time_delta: the number of days to scan since the file was last modified
+        time_delta: scan files this many days old
 
     Returns:
         textual_files: all the textual files name found in the bucket
@@ -130,6 +130,7 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
                                        ".eml", ".gpg", ".iwa", ".jar", ".java", ".msg", ".p12", ".pgp", ".py",
                                        ".sql", ".tsv", ".xls", ".xlsx", ".log", ".creds")):
                     textual_files.append(file_name)
+                ##if file_name contains 'credentials' or results of 'file' command is a text file add to textual_files.append(file_name)
         return textual_files
     except Exception as e:
         logger.debug(f'list_bucket_content exception raised -> {e}')
