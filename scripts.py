@@ -12,26 +12,26 @@ def scan_internal_accounts(aws_profile: str, scanner_role: str, time_delta: int)
     """ Main function to scan internal accounts
 
     Args:
-        aws_profile: the aws profile in ~./aws/credentials
-        scanner_role: the role name without ARN
-        time_delta: the number of days to scan since the file was last modified
+        aws_profile: the aws profile in ~/.aws/credentials
+        scanner_role: the role name without ARN prefix
+        time_delta: the number of days in the past to scan since the file was last modified
     """
     total_public_files = dict()
     accounts = utils.read_csv()
-    for account_name, account_id in accounts.items():
+    for account_name, account_id in accounts.items():#
         sts_token = aws.get_sts_token(account_id,
                                       profile_name=aws_profile,
                                       scanner_role_name=scanner_role)
-        bucket_list = aws.get_all_buckets(sts_token, account_name)
+        bucket_list = aws.get_all_buckets(sts_token, account_name) #############
         try:
             if bucket_list:
                 for bucket in bucket_list:
                     # Check bucket exposure
-                    is_public = aws.get_public_access_block(sts_token, bucket)
+                    is_public = aws.get_public_access_block(sts_token, bucket)  #######                   
                     if is_public:
                         logger.info(f"[*] Analyzing public bucket - {bucket} in"
                                     f" {account_name} account")
-                        textual_files = aws.list_bucket_content(sts_token, bucket, time_delta)
+                        textual_files = aws.list_bucket_content(sts_token, bucket, time_delta) 
                         if textual_files:
                             for file in textual_files:
                                 # Check file exposure
@@ -54,9 +54,13 @@ def scan_internal_accounts(aws_profile: str, scanner_role: str, time_delta: int)
                                                              )
                                     rule, findings = utils.run_trufflehog(bucket, file)
                                     if findings:
+                                        cyan = utils.Colors()
+                                        print(cyan.OKCYAN, cyan.UNDERLINE)
                                         logger.warning(f'[!] Scan finding -> {findings}')
+                                        print(cyan.ENDC)
                                         utils.write_findings(file_name='findings.json', findings=findings)
                                     utils.delete_files()
-                print("=== Scan completed ===")
+                purple = utils.Colors()
+                print(purple.PURPLE, "=== Scan completed ===", purple.ENDC)
         except TypeError as te:
             logger.debug(te)

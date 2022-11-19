@@ -48,7 +48,7 @@ The automation will perform the following actions:
 }
 ```
 
-4. If you're using a CSV file - make sure to place the file `accounts.csv` in the `csv` directory, in the following format:
+4. Make sure to edit the file `accounts.csv` in the `csv` directory to add the AWS account(s) you want to scan using the following format:
 ```csv
 Account name,Account id
 prod,123456789
