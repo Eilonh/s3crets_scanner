@@ -27,7 +27,7 @@ def print_banner():
   \__ \ /_ </ ___/ ___/ _ \/ __/  / ___/ ___/ __ `/ __ \/ __ \/ _ \/ ___/
  ___/ /__/ / /__/ /  /  __/ /_   (__  ) /__/ /_/ / / / / / / /  __/ /    
 /____/____/\___/_/   \___/\__/  /____/\___/\__,_/_/ /_/_/ /_/\___/_/     
-                                                                         v1.0 """)
+                                                                         v1.01 """)
 
 
 class Colors:
@@ -36,6 +36,7 @@ class Colors:
     OKCYAN = '\033[96m'
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
+    PURPLE = '\033[35m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
@@ -74,8 +75,11 @@ def read_csv() -> dict:
                     pass
                 except Exception as e:
                     logger.debug(e)
+        green = Colors()
+        print(green.OKGREEN)
         logger.info(f'[+] Successfully loaded CSV file - {cwd}/csv/accounts.csv')
         logger.info(f'[+] {len(accounts_dict)} accounts were loaded')
+        print(green.ENDC)
         return accounts_dict
     except Exception as e:
         logger.debug(e)
@@ -85,7 +89,7 @@ def read_csv() -> dict:
 def get_modified_date(time_delta: int) -> any:
     """ Calculate the time from the specified interval
     Args:
-        time_delta: the number of days to scan since the file was last modified
+        time_delta: scan files this many days old
 
     Return:
         the datetime object in %Y-%m-%d 00:00:00+00:00 format
@@ -103,10 +107,31 @@ def create_downloads_folder():
         os.mkdir(f'{cwd}/downloads')
         logger.info("Successfully created downloads directory in the CWD")
     except Exception as e:
+        red = Colors()
+        print(red.FAIL)
         logger.error(f"create_downloads_folder exception raised -> {e}")
         sys.exit()
 
-
+#check if the current user has aws credentials in their home directory
+def check_for_local_aws_credentials():
+    try:
+        files = glob.glob(f'~/.aws/credentials')
+        if files == True:
+            logger.info(f"[*] Local AWS Credentials file found!")
+            return True
+        else:
+            error_text = ("AWS Credentials not found! \n\nMake sure you have installed AWS CLI found here: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html \n\n"
+            "Next, create an IAM User with programmatic access to obtain a KEYID and KEY. See Programmatic Access here: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html"
+            "\nand here https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html \n\n"
+            "Lastly, use 'aws configure' to set your AWS Credentials. See New Configuration quick setup here:  https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html \n")
+            #logger.error(error_text)
+            raise RuntimeError(error_text)
+    except Exception as e:
+        red = Colors()
+        print(red.FAIL)
+        logger.error(f"check_for_local_aws_credentials error raised -> {e}")
+        sys.exit()
+        
 def delete_files():
     try:
         files = glob.glob(f'{cwd}/downloads/*')
@@ -149,13 +174,19 @@ def run_trufflehog(bucket, file):
         if all_findings:
             return all_findings[0]['rule'], all_findings[0]
         else:
+            light_green = Colors()
+            print(light_green.LIGHTGREEN)
             logger.info("[-] No results found in {}".format(file))
+            print(light_green.ENDC)
             return None, None
     except IndexError:
         logger.info("No results found in {}".format(file))
         return None, None
     except Exception as e:
+        red = Colors()
+        print(red.FAIL)
         logger.error(f"run_trufflehog exception raised -> {e}")
+        print(red.ENDC)
         return None, None
 
 
@@ -169,10 +200,15 @@ def prerequisite_checks(*args):
             except AssertionError as ae:
                 missing_files.append("".join(ae.args))
         if missing_files:
+            red = Colors()
+            print(red.FAIL)
             logger.error(f'The following files could not be found - {missing_files}')
             sys.exit()
         else:
+            green = Colors()
+            print(green.OKGREEN)
             logger.info("[+] Prerequisite checks passed")
+            print(green.ENDC)
     except Exception as e:
         logger.error(e)
 
@@ -185,4 +221,7 @@ def download_content(bucket_name, file_name, download_name):
         with open(f'{os.getcwd()}/downloads/{download_name}', 'w') as f:
             f.write(text_file)
     except Exception as e:
+        red = Colors()
+        print(red.FAIL)
         logger.error(f'download_content exception raised -> {e}')
+        print(red.ENDC)
