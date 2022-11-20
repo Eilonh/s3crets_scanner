@@ -12,6 +12,7 @@ import re
 from logger_config import logger_conf
 import shutil
 import sys
+from os.path import expanduser
 
 # Logger instance
 logger_conf()
@@ -27,7 +28,7 @@ def print_banner():
   \__ \ /_ </ ___/ ___/ _ \/ __/  / ___/ ___/ __ `/ __ \/ __ \/ _ \/ ___/
  ___/ /__/ / /__/ /  /  __/ /_   (__  ) /__/ /_/ / / / / / / /  __/ /    
 /____/____/\___/_/   \___/\__/  /____/\___/\__,_/_/ /_/_/ /_/\___/_/     
-                                                                         v1.01 """)
+                                                                         🪣 v1.01 """)
 
 
 class Colors:
@@ -75,11 +76,10 @@ def read_csv() -> dict:
                     pass
                 except Exception as e:
                     logger.debug(e)
-        green = Colors()
-        print(green.OKGREEN)
+        print(Colors.OKGREEN, end="")
         logger.info(f'[+] Successfully loaded CSV file - {cwd}/csv/accounts.csv')
         logger.info(f'[+] {len(accounts_dict)} accounts were loaded')
-        print(green.ENDC)
+        print(Colors.ENDC, end="")
         return accounts_dict
     except Exception as e:
         logger.debug(e)
@@ -107,17 +107,17 @@ def create_downloads_folder():
         os.mkdir(f'{cwd}/downloads')
         logger.info("Successfully created downloads directory in the CWD")
     except Exception as e:
-        red = Colors()
-        print(red.FAIL)
+        print(Colors.FAIL)
         logger.error(f"create_downloads_folder exception raised -> {e}")
         sys.exit()
 
 #check if the current user has aws credentials in their home directory
 def check_for_local_aws_credentials():
     try:
-        files = glob.glob(f'~/.aws/credentials')
-        if files == True:
-            logger.info(f"[*] Local AWS Credentials file found!")
+        home = expanduser("~")
+        file_check = os.path.exists(f'{home}/.aws/credentials')
+        if file_check == True:
+            logger.info(f"{Colors.OKGREEN}[*] Local AWS Credentials file found!{Colors.ENDC}")
             return True
         else:
             error_text = ("AWS Credentials not found! \n\nMake sure you have installed AWS CLI found here: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html \n\n"
@@ -127,9 +127,7 @@ def check_for_local_aws_credentials():
             #logger.error(error_text)
             raise RuntimeError(error_text)
     except Exception as e:
-        red = Colors()
-        print(red.FAIL)
-        logger.error(f"check_for_local_aws_credentials error raised -> {e}")
+        logger.error(f"{Colors.FAIL}check_for_local_aws_credentials error raised -> {e}{Colors.ENDC}")
         sys.exit()
         
 def delete_files():
@@ -139,7 +137,7 @@ def delete_files():
             os.remove(file)
             logger.info("[*] Successfully deleted {}".format(file))
     except Exception as e:
-        logger.error(f"delete_files exception raised -> {e}")
+        logger.error(f"{Colors.FAIL}delete_files exception raised -> {e}{Colors.ENDC}")
 
 
 def write_findings(file_name, findings):
@@ -147,7 +145,7 @@ def write_findings(file_name, findings):
         with open(file_name, "a") as file:
             file.write(json.dumps(findings)+"\n")
     except Exception as e:
-        logger.error(f"write_findings error raised -> {e}")
+        logger.error(f"{Colors.FAIL}write_findings error raised -> {e}{Colors.ENDC}")
 
 
 def run_trufflehog(bucket, file):
@@ -174,19 +172,15 @@ def run_trufflehog(bucket, file):
         if all_findings:
             return all_findings[0]['rule'], all_findings[0]
         else:
-            light_green = Colors()
-            print(light_green.LIGHTGREEN)
+            print(Colors.LIGHTGREEN, end="")
             logger.info("[-] No results found in {}".format(file))
-            print(light_green.ENDC)
+            print(Colors.ENDC, end="")
             return None, None
     except IndexError:
         logger.info("No results found in {}".format(file))
         return None, None
     except Exception as e:
-        red = Colors()
-        print(red.FAIL)
-        logger.error(f"run_trufflehog exception raised -> {e}")
-        print(red.ENDC)
+        logger.error(f"{Colors.FAIL}run_trufflehog exception raised -> {e}{Colors.ENDC}")
         return None, None
 
 
@@ -200,15 +194,10 @@ def prerequisite_checks(*args):
             except AssertionError as ae:
                 missing_files.append("".join(ae.args))
         if missing_files:
-            red = Colors()
-            print(red.FAIL)
-            logger.error(f'The following files could not be found - {missing_files}')
+            logger.error(f'{Colors.FAIL}The following files could not be found - {missing_files}')
             sys.exit()
         else:
-            green = Colors()
-            print(green.OKGREEN)
-            logger.info("[+] Prerequisite checks passed")
-            print(green.ENDC)
+            logger.info(f"{Colors.OKGREEN}[+] Prerequisite checks passed")
     except Exception as e:
         logger.error(e)
 
@@ -221,7 +210,4 @@ def download_content(bucket_name, file_name, download_name):
         with open(f'{os.getcwd()}/downloads/{download_name}', 'w') as f:
             f.write(text_file)
     except Exception as e:
-        red = Colors()
-        print(red.FAIL)
-        logger.error(f'download_content exception raised -> {e}')
-        print(red.ENDC)
+        logger.error(f'{Colors.FAIL}download_content exception raised -> {e}{Colors.ENDC}')
