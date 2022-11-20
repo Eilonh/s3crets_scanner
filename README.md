@@ -103,11 +103,11 @@ pip3 install trufflehog3
 ## Troubleshooting
 Commomn errors and how to fix them:
 
-* "The following files could not be found - \['trufflehog3']"
+* "The following files could not be found - ['trufflehog3']"
   
-  trufflehog3 is missing. Install it with pip3 install trufflehog3
+  trufflehog3 is missing. Install it with 'pip3 install trufflehog3'
 
-* "The following files could not be found - \['aws']
+* "The following files could not be found - ['aws']
   
   AWS CLI is missing. Download and install it from https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
