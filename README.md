@@ -16,7 +16,7 @@ The automation will perform the following actions:
 ## Prerequisites
 1. Python 3.6 or above
 2. TruffleHog3 installed in $PATH
-3. An AWS role with the following permissions:
+3. An AWS role with the following permissions. Make sure you allow the role to be assumed by editing the SID "AllowRoleToBeAssumed" with your    account's ARN for the role:
 
 ```json
 {
@@ -43,6 +43,16 @@ The automation will perform the following actions:
             "Effect": "Allow",
             "Action": "s3:ListAllMyBuckets",
             "Resource": "*"
+        },
+        {
+            "Sid": "AllowRoleToBeAssumed",
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Resource": [
+                "arn:aws:iam::123456789012:role/desired-role"
+            ]
         }
     ]
 }
@@ -88,6 +98,38 @@ pip3 install trufflehog3
 ## Demo
 
 ![](DOCS/scanner_gif.gif)
+
+-----
+## Troubleshooting
+Commomn errors and how to fix them:
+
+* "The following files could not be found - \\['trufflehog3']"
+    trufflehog3 is missing. Install it with pip3 install trufflehog3
+
+* "The following files could not be found - \\['aws']
+    AWS CLI is missing. Download and install it from https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+* "check_for_local_aws_credentials error raised -> AWS Credentials not found!"
+    Make sure you have installed AWS CLI found here: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+    Next, create an IAM User with programmatic access to obtain a KEYID and KEY (unless you have one already).
+    See Programmatic Access here: https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html and here https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html
+    Lastly, use 'aws configure' to set your AWS Credentials. See New Configuration quick setup here:  https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html
+
+* "[-] get_sts_token exception raise -> An error occurred (AccessDenied) when calling the AssumeRole operation: User: arn:aws:iam::0123456789012:user/example_user is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::123456789012:role/example_role"
+    Make sure you have created an IAM Role that can be assumed by your chosen IAM User. If you have a role already, then ensure that it can be assumed by your chosen IAM User. See item number 3 in the prerequisites section above.
+
+    Creating an IAM User: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html
+    Creating an IAM Role for an IAM Role: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html
+
+
+* "[-] get_sts_token exception raise -> Provided region_name 'seemingly-random-string-RegionCode' doesn't match a supported format."
+    It is likely that you have pasted the IAM Key with a line break. Re-run "aws configure" and be sure that the KEY ID and KEY are pasted as one continuous string with no breaks.
+
+* "download_content exception raised -> [Errno 2] No such file or directory: '/Users/example_user/Documents/s3crets_scanner/downloads/abc123.xyz'"
+    The downloads folder is missing. Check to make the user account you are using to run S3cret Scanner has permissions to create folders.
+
+
+
 
 -----
 ## References
