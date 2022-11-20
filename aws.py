@@ -21,9 +21,10 @@ config = Config(
     )
 )
 
+colors = utils.Colors()
 
 def get_sts_token(account_id: any, profile_name: str, scanner_role_name: str) -> dict or None:
-    """Assumes the IAM role you must set up for the scanner in the supplied account number
+    """Assumes the IAM role you must set up for s3cret scanner in the accounts specified in accounts.csv
 
     Args:
         account_id: the number representation of the account
@@ -55,8 +56,7 @@ def get_sts_token(account_id: any, profile_name: str, scanner_role_name: str) ->
         return session
 
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
+        print(colors.FAIL)
         logger.debug(f"[-] get_sts_token exception raise -> {e}")
         logger.debug(f"[?] Did you forget to edit the CSV file found here: {utils.cwd}/csv/accounts.csv ?")
         logger.debug(f"[?] Did you remember to run 'aws configure'? https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html ")
@@ -80,10 +80,7 @@ def get_all_buckets(session, account_name) -> list or None:
             bucket_list.append(bucket.name)
         return bucket_list
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f"[-] get_all_buckets exception raised on {account_name} -> {e}")
-        print(red.ENDC)
+        logger.debug(f"{colors.FAIL}[-] get_all_buckets exception raised on {account_name} -> {e}{colors.ENDC}")
         return None
 
 
@@ -104,10 +101,7 @@ def get_all_objects_anonymous(bucket_name) -> list or None:
             objects_list.append(item.key)
         return objects_list
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f"[-] get_all_buckets exception raised -> {e}")
-        print(red.ENDC)
+        logger.debug(f"{colors.FAIL}[-] get_all_buckets exception raised -> {e}{colors.ENDC}")
         return None
 
 
@@ -143,10 +137,7 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
                 ##if file_name contains 'credentials' or results of 'file' command is a text file add to textual_files.append(file_name)
         return textual_files
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f'list_bucket_content exception raised -> {e}')
-        print(red.ENDC)
+        logger.debug(f'{colors.FAIL}list_bucket_content exception raised -> {e}{colors.ENDC}')
 
 
 def get_object_acl(bucket_name: str, file_path: str, session: str) -> str or None:
@@ -170,10 +161,7 @@ def get_object_acl(bucket_name: str, file_path: str, session: str) -> str or Non
                     return file_path
         return None
     except Exception as e:
-        yellow = utils.Colors()
-        print(yellow.WARNING)
-        logger.info(f"Blocked by Bucket ACL - {file_path} -> {e}")
-        print(yellow.ENDC)
+        logger.info(f"{colors.WARNING}Blocked by Bucket ACL - {file_path} -> {e}{colors.ENDC}")
 
 
 def download_content(session: str, bucket_name: str, file_name: str, download_name: str):
@@ -190,10 +178,7 @@ def download_content(session: str, bucket_name: str, file_name: str, download_na
         downloaded_file = f'{os.getcwd()}/downloads/{download_name}'
         s3.download_file(bucket_name, file_name, downloaded_file)
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f'download_content exception raised -> {e}')
-        print(red.ENDC)
+        logger.debug(f'{colors.FAIL}download_content exception raised -> {e}{colors.ENDC}')
 
 def download_public_content(bucket_name: str, file_name: str, download_name: str):
     """Download the file to the ${cwd}/downloads folder, using Boto3
@@ -212,10 +197,7 @@ def download_public_content(bucket_name: str, file_name: str, download_name: str
         downloaded_file = f'{cwd}/downloads/{download_name}'
         client.download_file(bucket_name, file_name, downloaded_file)
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f"[-] download_content exception raised -> {e}")
-        print(red.ENDC)
+        logger.debug(f"{colors.FAIL}[-] download_content exception raised -> {e}{colors.FAIL}")
 
 def get_public_access_block(session: str, bucket_name: str) -> bool or None:
     """
@@ -242,8 +224,5 @@ def get_public_access_block(session: str, bucket_name: str) -> bool or None:
         if ce.response['Error'].get('Code') == 'NoSuchPublicAccessBlockConfiguration':
             return True
     except Exception as e:
-        red = utils.Colors()
-        print(red.FAIL)
-        logger.debug(f"[-] get_public_access_block exception raised -> {e}")
-        print(red.ENDC)
+        logger.debug(f"{colors.FAIL}[-] get_public_access_block exception raised -> {e}{colors.ENDC}")
         return None
