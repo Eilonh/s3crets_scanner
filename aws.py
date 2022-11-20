@@ -21,13 +21,14 @@ config = Config(
     )
 )
 
+colors = utils.Colors()
 
 def get_sts_token(account_id: any, profile_name: str, scanner_role_name: str) -> dict or None:
-    """Assumes the role of the scanner role
+    """Assumes the IAM role you must set up for s3cret scanner in the accounts specified in accounts.csv
 
     Args:
         account_id: the number representation of the account
-        profile_name: the aws profile in ~./aws/credentials
+        profile_name: the IAM user name that corresponds with the KEYID and KEY stored in the local aws profile in ~./aws/credentials
         scanner_role_name: the role name without ARN
 
 
@@ -55,12 +56,15 @@ def get_sts_token(account_id: any, profile_name: str, scanner_role_name: str) ->
         return session
 
     except Exception as e:
+        print(colors.FAIL)
         logger.debug(f"[-] get_sts_token exception raise -> {e}")
+        logger.debug(f"[?] Did you forget to edit the CSV file found here: {utils.cwd}/csv/accounts.csv ?")
+        logger.debug(f"[?] Did you remember to run 'aws configure'? https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html ")
         sys.exit()
 
 
 def get_all_buckets(session, account_name) -> list or None:
-    """List all buckets in the account
+    """List all buckets in the supplied account
 
     Args:
         session: the active session key
@@ -76,7 +80,7 @@ def get_all_buckets(session, account_name) -> list or None:
             bucket_list.append(bucket.name)
         return bucket_list
     except Exception as e:
-        logger.debug(f"[-] get_all_buckets exception raised on {account_name} -> {e}")
+        logger.debug(f"{colors.FAIL}[-] get_all_buckets exception raised on {account_name} -> {e}{colors.ENDC}")
         return None
 
 
@@ -97,7 +101,7 @@ def get_all_objects_anonymous(bucket_name) -> list or None:
             objects_list.append(item.key)
         return objects_list
     except Exception as e:
-        logger.debug(f"[-] get_all_buckets exception raised -> {e}")
+        logger.debug(f"{colors.FAIL}[-] get_all_buckets exception raised -> {e}{colors.ENDC}")
         return None
 
 
@@ -107,7 +111,7 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
     Args:
         session: the active session key
         bucket_name: the name of the specific bucket
-        time_delta: the number of days to scan since the file was last modified
+        time_delta: scan files this many days old
 
     Returns:
         textual_files: all the textual files name found in the bucket
@@ -130,9 +134,10 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
                                        ".eml", ".gpg", ".iwa", ".jar", ".java", ".msg", ".p12", ".pgp", ".py",
                                        ".sql", ".tsv", ".xls", ".xlsx", ".log", ".creds")):
                     textual_files.append(file_name)
+                ##if file_name contains 'credentials' or results of 'file' command is a text file add to textual_files.append(file_name)
         return textual_files
     except Exception as e:
-        logger.debug(f'list_bucket_content exception raised -> {e}')
+        logger.debug(f'{colors.FAIL}list_bucket_content exception raised -> {e}{colors.ENDC}')
 
 
 def get_object_acl(bucket_name: str, file_path: str, session: str) -> str or None:
@@ -156,7 +161,7 @@ def get_object_acl(bucket_name: str, file_path: str, session: str) -> str or Non
                     return file_path
         return None
     except Exception as e:
-        logger.info(f"Blocked by Bucket ACL - {file_path} -> {e}")
+        logger.info(f"{colors.WARNING}Blocked by Bucket ACL - {file_path} -> {e}{colors.ENDC}")
 
 
 def download_content(session: str, bucket_name: str, file_name: str, download_name: str):
@@ -173,8 +178,7 @@ def download_content(session: str, bucket_name: str, file_name: str, download_na
         downloaded_file = f'{os.getcwd()}/downloads/{download_name}'
         s3.download_file(bucket_name, file_name, downloaded_file)
     except Exception as e:
-        logger.debug(f'download_content exception raised -> {e}')
-
+        logger.debug(f'{colors.FAIL}download_content exception raised -> {e}{colors.ENDC}')
 
 def download_public_content(bucket_name: str, file_name: str, download_name: str):
     """Download the file to the ${cwd}/downloads folder, using Boto3
@@ -193,8 +197,7 @@ def download_public_content(bucket_name: str, file_name: str, download_name: str
         downloaded_file = f'{cwd}/downloads/{download_name}'
         client.download_file(bucket_name, file_name, downloaded_file)
     except Exception as e:
-        logger.debug(f"[-] download_content exception raised -> {e}")
-
+        logger.debug(f"{colors.FAIL}[-] download_content exception raised -> {e}{colors.FAIL}")
 
 def get_public_access_block(session: str, bucket_name: str) -> bool or None:
     """
@@ -221,5 +224,5 @@ def get_public_access_block(session: str, bucket_name: str) -> bool or None:
         if ce.response['Error'].get('Code') == 'NoSuchPublicAccessBlockConfiguration':
             return True
     except Exception as e:
-        logger.debug(f"[-] get_public_access_block exception raised -> {e}")
+        logger.debug(f"{colors.FAIL}[-] get_public_access_block exception raised -> {e}{colors.ENDC}")
         return None
