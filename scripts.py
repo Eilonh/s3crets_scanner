@@ -44,7 +44,7 @@ def scan_internal_accounts(aws_profile: str, scanner_role: str, time_delta: int)
                                     # Normalize file names
                                     download_name = utils.normalize_filename(public_file)
                                     aws.download_content(sts_token, bucket, public_file, download_name)
-                                    if public_file.endswith((".p12", ".pgp", ".docx", ".dotx", ".xslx")):
+                                    if public_file.endswith((".p12", ".pgp", ".docx", ".dotx", ".xslx", ".pem")):
                                         logger.info(f"[!] Encrypted file type found -> {public_file}")
                                         utils.write_findings(file_name='findings.json',
                                                              findings=[{
