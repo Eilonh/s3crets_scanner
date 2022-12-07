@@ -128,7 +128,7 @@ def list_bucket_content(session: str, bucket_name: str, time_delta: int) -> list
                 if file_name.endswith((".txt", "log", ".htm", ".xml", ".json", ".js", ".accdb", ".bat", ".c", ".c#",
                                        ".cer", ".cpp", ".cxx", ".dbf", ".doc", ".docx", ".dot", ".dotx",
                                        ".eml", ".gpg", ".iwa", ".jar", ".java", ".msg", ".p12", ".pgp", ".py",
-                                       ".sql", ".tsv", ".xls", ".xlsx", ".log", ".creds")):
+                                       ".sql", ".tsv", ".xls", ".xlsx", ".log", ".creds", ".pem")):
                     textual_files.append(file_name)
         return textual_files
     except Exception as e:
